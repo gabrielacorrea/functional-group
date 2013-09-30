@@ -1,0 +1,52 @@
+Abstract classes can have constructor parameters as well as type parameters. 
+Traits can have only type parameters. There was some discussion that in future even traits can have constructor parameters
+
+Abstract classes are fully interoperable with Java. You can call them from Java code without any wrappers. 
+Traits are fully interoperable only if they do not contain any implementation code
+
+abstract class Animal {   def breathe : Unit; }
+class Dog extends Animal {  def breathe {  println("Dogs breath!");  } }
+val r = new Dog
+
+abstract class Shape {    def getArea():Int     } 
+class Circle(r: Int) extends Shape { def getArea():Int = { r * r * 3 }  }
+
+val s = new Shape ### WRONG
+val c = new Circle(2)
+
+
+Traits e Tipos estruturais
+Scala não tem interfaces, mas para desempenhar a funcão das interfaces com maestria, scala possui traits.
+Traits, diferente de interfaces podem ter implementações padrão para os métodos definidos, podem inclusive implementar todos os métodos definidos.
+Com traits é possível ter diversas das vantagens da herança multipla, sem ter a maior parte dos problemas desta.
+A palavra “trait” na computação significa uma coleção de métodos, utilizados como um modelo conceitual simples para estruturar programas orientados a objetos.
+Em resumo traits são uma coleção de métodos, abstratos ou não, que podem ser utilizados como a definição de um contrato (neste caso suprindo a falta de interfaces), e também podem ser utilizados para compor classes.
+Scala não tem herança multipla, um objeto pode herdar apenas de uma classe, mas pode anexar muitos traits. Veja no exemplo abaixo:
+samples/010_traits.scala
+
+trait Flyer {   def fly = println("I can fly!") }
+
+trait Jumper {  def jump = println("I can jump!") }
+
+trait Walker {  def walk = println("I walk too!") }
+
+class Animal {  def breathe = println("Dogs breath!") }
+
+class Dog extends Animal with Jumper { }
+
+class Bird extends Animal with Flyer with Jumper{ }
+
+class Airplane extends Flyer { }
+
+object TraitsApp extends Application {
+  val dog = new Dog with Walker
+  val bird = new Bird
+  val plane = new Airplane
+  dog.breathe
+  dog.jump
+  dog.walk
+  bird.breathe
+  bird.jump
+  bird.fly
+  plane.fly
+}

@@ -1,0 +1,49 @@
+//
+// default constructor without params
+//
+class Greeter {
+    def SayHi() = println("Hello world!")
+}
+
+val greeter = new Greeter()
+greeter.SayHi()
+
+//
+// default constructor with params
+//
+
+class Greeter(message: String) {
+    def SayHi() = println(message)
+}
+
+val greeter = new Greeter("Hello world!")
+greeter.SayHi()
+
+//
+// default constructor with statements
+//
+
+class Greeter(message: String) {
+    println("A greeter is being instantiated")
+    
+    def SayHi() = println(message)
+}
+
+val greeter = new Greeter("Hello world!")
+greeter.SayHi()
+
+//
+// overloaded constructor
+//
+
+class Greeter(message: String, secondaryMessage: String) {
+    def this(message: String) = this(message, "")
+    
+    def SayHi() = println(message + secondaryMessage)
+}
+
+val greeter = new Greeter("Hello world!")
+greeter.SayHi()
+
+
+
