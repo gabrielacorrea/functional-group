@@ -8,6 +8,7 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.libs.ws.WS
 import scala.xml._
+import scala.collection.mutable.Map
 import service.JenkinsService
 
 object Application extends Controller {
@@ -38,19 +39,36 @@ object Application extends Controller {
   }
 
   def dashboard = Action {
-    import scala.collection.mutable.Map
 
     val jobs : Seq[String] = Seq("Cortellis-Services-Alert-SEDA-build", "Cortellis-Services-Export-build", "Cortellis-Services-Retrieve-Regulatory-CI")
 
+    //
+    // traverse each of the jobs
+    //
     var results = Map[String, scala.xml.Elem]()
+    jobs.map(job =>  results += job -> scala.xml.XML.load(JenkinsService.callService(job).get))
 
-    jobs.map(job => {
-      results += job -> scala.xml.XML.load(JenkinsService.callService(job).get)
-    })
+    //
+    // prepare the content
+    //
+    var html :StringBuilder  = new StringBuilder
 
-    Ok(views.html.index.render(results.size.toString))
+    results.foreach{
+      keyVal => {
+        html.append("<h1>").append(keyVal._1).append("</h1>")
+
+        val currentBuildNumber = (keyVal._2 \\  "lastBuild" \\ "number").text
+        val lastFailBuildNumber = (keyVal._2 \\ "lastFailedBuild" \\ "number").text
+
+        html.append(currentBuildNumber match {
+          case currentBuildNumber if currentBuildNumber.equals(lastFailBuildNumber) => "<img src='/assets/images/error.png' />"
+          case _ => "<img src='/assets/images/success.png' />"
+        })
+       }
+      }
+
+    Ok(views.html.dashboard.render(html))
   }
-
 
 
 }
