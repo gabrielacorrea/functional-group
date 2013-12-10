@@ -50,12 +50,19 @@ object Application extends Controller {
   }
 
   def dashboard = Action {
+    import scala.collection.mutable.Map
 
-    val resp = JenkinsService.callService("Cortellis-Services-Alert-SEDA-build")
+    val jobs : Seq[String] = Seq("Cortellis-Services-Alert-SEDA-build", "Cortellis-Services-Export-build", "Cortellis-Services-Retrieve-Regulatory-CI")
 
-    val xml = scala.xml.XML.load(resp.get)
+    var results = Map[String, scala.xml.Elem]()
 
-    Ok(views.html.index.render(xml.toString(),null ))
+    jobs.map(job => {
+      results += job -> scala.xml.XML.load(JenkinsService.callService(job).get)
+    })
+
+    Ok(views.html.index.render(results.size.toString,null))
   }
+
+
 
 }
