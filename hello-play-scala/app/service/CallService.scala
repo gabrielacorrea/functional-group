@@ -4,10 +4,9 @@ import java.io.InputStream
 
 object JenkinsService {
 
-  val host = "https://ci.thomsonreuterslifesciences.com/jenkins/job/Cortellis-Services-Retrieve-build/api/xml"
 
-  def callService(): Option[InputStream] = {
-    val conn = connection()
+  def callService(host:String): Option[InputStream] = {
+    val conn = connection(host)
     try {
       Some(conn.getInputStream())
     } catch {
@@ -17,7 +16,7 @@ object JenkinsService {
     }
   }
 
-  private def connection(): java.net.HttpURLConnection = {
+  private def connection(host:String): java.net.HttpURLConnection = {
     val url = new java.net.URL(host)
     val conn = url.openConnection.asInstanceOf[java.net.HttpURLConnection]
     conn.setRequestMethod("GET")
