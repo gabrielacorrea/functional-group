@@ -2,22 +2,37 @@ package controllers
 
 import java.io.InputStream
 import scala.language.postfixOps
+import scala.xml._
+import model.JobDetail
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import play.api.libs.ws.WS
-import scala.xml._
 import service.JenkinsService
-import play.api.data.Form
-import model.JobDetail
+import play.api.data.Forms._
 
 object Application extends Controller {
 
     
-  def index = Action {
+  def index = Action{
+    Ok("Hello Scala")
+  }
 
-    val url = "Cortellis-Services-Retrieve-build"
+  def dashboard = Action {
+    import scala.collection.mutable.Map
+
+    val jobs : Seq[String] = Seq("Cortellis-Services-Alert-SEDA-build", "Cortellis-Services-Export-build", "Cortellis-Services-Retrieve-Regulatory-CI")
+
+    var results = Map[String, scala.xml.Elem]()
+
+    jobs.map(job => {
+      results += job -> scala.xml.XML.load(JenkinsService.callService(job).get)
+    })
+
+    Ok(views.html.index.render(results.size.toString))
+  }
+  
+  def showDetail(name:String) = Action {
+	val url = name
     var resp = JenkinsService.callService(url)
 
     var xmlResult = scala.xml.XML.load(resp.get)
@@ -46,23 +61,7 @@ object Application extends Controller {
 
     val value =JobDetail(lastBuild, failureTest, skipTest, totalTest, user, result, date)
     
-    Ok(views.html.index.render(buf.toString,value))
+    Ok(views.html.showDetail.render(buf.toString,value))
   }
-
-  def dashboard = Action {
-    import scala.collection.mutable.Map
-
-    val jobs : Seq[String] = Seq("Cortellis-Services-Alert-SEDA-build", "Cortellis-Services-Export-build", "Cortellis-Services-Retrieve-Regulatory-CI")
-
-    var results = Map[String, scala.xml.Elem]()
-
-    jobs.map(job => {
-      results += job -> scala.xml.XML.load(JenkinsService.callService(job).get)
-    })
-
-    Ok(views.html.index.render(results.size.toString,null))
-  }
-
-
 
 }
