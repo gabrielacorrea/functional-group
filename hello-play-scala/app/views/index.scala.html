@@ -2,8 +2,24 @@
 
 @main("Welcome to Play Framework") {
 
-    <div class="well">
-      <h1> @message</h1>
-    </div>
+      
+    
+    <div class="tab-content">
+            <div class="div-edge">
+            	<div class="row">
+					<div class="col-sm-12">    
+					    <div class="form-group col-xs-4 ">
+				    		<label for="stateId" class="control-label">Last Build: @detail.lastBuild</label>
+				    		<div>
+				    			<input type="hidden" id="stateId" name="stateId" value="">
+				    			<input type="hidden" id="stateName" name="stateName" value="">  
+				    		</div>
+            			</div>
+			            
+            		</div>
+            	</div>
+           	</div>
+          
+		</div>
 
 }
