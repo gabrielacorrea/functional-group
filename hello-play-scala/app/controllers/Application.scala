@@ -12,38 +12,22 @@ import service.JenkinsService
 
 object Application extends Controller {
 
-  val host = "https://ci.thomsonreuterslifesciences.com/jenkins/job/Cortellis-Services-Retrieve-build/api/xml"
-
   def index = Action {
 
-    val resp = JenkinsService.callService(host)
+    val resp = JenkinsService.callService("Cortellis-Services-Alert-SEDA-build")
     
     val xml = scala.xml.XML.load(resp.get)  
     
     Ok(views.html.index.render(xml.toString()))
   }
 
+  def dashboard = Action {
 
-  def parseJson(): String = {
+    val resp = JenkinsService.callService("Cortellis-Services-Alert-SEDA-build")
 
-    val json: JsValue = Json.parse("""
-{
-  "user": {
-    "name" : "toto",
-    "age" : 25,
-    "email" : "toto@jmail.com",
-    "isAlive" : true,
-    "friend" : {
-      "name" : "tata",
-      "age" : 20,
-      "email" : "tata@coldmail.com"
-    }
+    val xml = scala.xml.XML.load(resp.get)
+
+    Ok(views.html.index.render(xml.toString()))
   }
-}
-""")
 
-    val name: String = (json \ "user" \ "name").as[String]
-
-    name
-  }
 }
