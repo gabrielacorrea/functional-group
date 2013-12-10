@@ -12,11 +12,10 @@ import service.JenkinsService
 
 object Application extends Controller {
 
-  val host = "https://ci.thomsonreuterslifesciences.com/jenkins/job/Cortellis-Services-Retrieve-build/836/api/xml"
 
   def index = Action {
 
-    val resp = JenkinsService.callService(host)
+    val resp = JenkinsService.callService("Cortellis-Services-Retrieve-build/836")
 
     val xmlResult = scala.xml.XML.load(resp.get)
 
