@@ -2,8 +2,8 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET     /                           controllers.Application.index()
-GET     /dashboard                  controllers.Application.dashboard()
+GET     /                           controllers.Application.dashboard()
+GET     /showDetail/:name           controllers.Application.showDetail(name:String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

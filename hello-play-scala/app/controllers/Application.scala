@@ -2,40 +2,55 @@ package controllers
 
 import java.io.InputStream
 import scala.language.postfixOps
+import scala.xml._
+import model.JobDetail
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.libs.ws.WS
 import scala.xml._
 import scala.collection.mutable.Map
 import service.JenkinsService
+import play.api.data.Forms._
 
 object Application extends Controller {
 
+    
+  def index = Action{
+    Ok("Hello Scala")
+  }
 
-  def index = Action {
+  def showDetail(name:String) = Action {
+	val url = name
+    var resp = JenkinsService.callService(url)
 
-    val resp = JenkinsService.callService("Cortellis-Services-Retrieve-build/836")
+    var xmlResult = scala.xml.XML.load(resp.get)
 
-    val xmlResult = scala.xml.XML.load(resp.get)
+    val lastBuild = (xmlResult \\ "mavenModuleSet" \\ "lastBuild" \\ "number").text
+
+    resp = JenkinsService.callService(url + "/" + lastBuild)
+    xmlResult = scala.xml.XML.load(resp.get)
 
     val failureTest = (xmlResult \\ "mavenModuleSetBuild" \\ "action" \\ "failCount").text
     val skipTest = (xmlResult \\ "mavenModuleSetBuild" \\ "action" \\ "skipCount").text
     val totalTest = (xmlResult \\ "mavenModuleSetBuild" \\ "action" \\ "totalCount").text
     val user = (xmlResult \\ "mavenModuleSetBuild" \\ "action" \\ "participant" \\ "fullName").text
+    val user2 = (xmlResult \\ "mavenModuleSetBuild" \\ "culprit" \\ "fullName").text
     val result = (xmlResult \\ "mavenModuleSetBuild" \\ "result").text
     val date = (xmlResult \\ "mavenModuleSetBuild" \\ "changeSet" \\ "item" \\ "date").text
 
     val buf = new StringBuilder
+    buf.append("Last Number = " + lastBuild)
     buf.append("Failure Test = " + failureTest)
     buf.append("Skip Test = " + skipTest)
     buf.append("Count Test = " + totalTest)
-    buf.append("User Name  = " + user)
-    buf.append("Resul  = " + result)
+    buf.append("User Name  = " + user + " / " + user2)
+    buf.append("Result  = " + result)
     buf.append("Date  = " + date)
 
-    Ok(views.html.index.render(buf.toString))
+    val value =JobDetail(lastBuild, failureTest, skipTest, totalTest, user, result, date)
+    
+    Ok(views.html.showDetail.render(buf.toString,value))
   }
 
   def dashboard = Action {
@@ -69,6 +84,5 @@ object Application extends Controller {
 
     Ok(views.html.dashboard.render(html))
   }
-
 
 }
