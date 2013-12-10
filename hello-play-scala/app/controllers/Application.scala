@@ -1,19 +1,32 @@
 package controllers
 
-import play.api.mvc.{Action, Controller}
-import play.api.libs.json._
-import play.api.Logger
+import java.io.InputStream
+import scala.language.postfixOps
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.mvc.Action
+import play.api.mvc.Controller
+import play.api.libs.ws.WS
+import scala.xml._
+import service.JenkinsService
 
 object Application extends Controller {
-  def index = Action {  
-    Ok(views.html.index.render(parseJson()))
+
+  val host = "https://ci.thomsonreuterslifesciences.com/jenkins/job/Cortellis-Services-Retrieve-build/api/xml"
+
+  def index = Action {
+
+    val resp = JenkinsService.callService()
+    
+    val xml = scala.xml.XML.load(resp.get)  
+    
+    Ok(views.html.index.render(xml.toString()))
   }
-  
-  
-  def parseJson () : String = {
 
 
-val json: JsValue = Json.parse("""
+  def parseJson(): String = {
+
+    val json: JsValue = Json.parse("""
 {
   "user": {
     "name" : "toto",
@@ -29,7 +42,8 @@ val json: JsValue = Json.parse("""
 }
 """)
 
-val name: String = (json \ "user" \ "name").as[String]
+    val name: String = (json \ "user" \ "name").as[String]
 
-   name
-}}
+    name
+  }
+}
