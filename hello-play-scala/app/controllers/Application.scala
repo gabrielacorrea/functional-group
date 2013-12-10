@@ -12,8 +12,6 @@ import service.JenkinsService
 
 object Application extends Controller {
 
-  val host = "https://ci.thomsonreuterslifesciences.com/jenkins/job/Cortellis-Services-Retrieve-build/api/xml"
-
   def index = Action {
 
     val resp = JenkinsService.callService()
