@@ -3,10 +3,11 @@ package service
 import java.io.InputStream
 
 object JenkinsService {
+  val host = "https://ci.thomsonreuterslifesciences.com/jenkins/job/"
+  val api = "/api/xml"
 
-
-  def callService(host:String): Option[InputStream] = {
-    val conn = connection(host)
+  def callService(job:String): Option[InputStream] = {
+    val conn = connection(host+job+api)
     try {
       Some(conn.getInputStream())
     } catch {
@@ -17,6 +18,7 @@ object JenkinsService {
   }
 
   private def connection(host:String): java.net.HttpURLConnection = {
+    println(host)
     val url = new java.net.URL(host)
     val conn = url.openConnection.asInstanceOf[java.net.HttpURLConnection]
     conn.setRequestMethod("GET")

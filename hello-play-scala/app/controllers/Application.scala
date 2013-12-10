@@ -23,42 +23,28 @@ object Application extends Controller {
     val failureTest = (xmlResult \\ "mavenModuleSetBuild" \\ "action" \\ "failCount").text
     val skipTest = (xmlResult \\ "mavenModuleSetBuild" \\ "action" \\ "skipCount").text
     val totalTest = (xmlResult \\ "mavenModuleSetBuild" \\ "action" \\ "totalCount").text
-    val user = (xmlResult \\ "mavenModuleSetBuild" \\ "action" \\ "participant" \\"fullName").text
-    val result  = (xmlResult \\ "mavenModuleSetBuild" \\ "result").text
-    val date = (xmlResult \\ "mavenModuleSetBuild" \\ "changeSet"\\"item"\\"date").text
-    
+    val user = (xmlResult \\ "mavenModuleSetBuild" \\ "action" \\ "participant" \\ "fullName").text
+    val result = (xmlResult \\ "mavenModuleSetBuild" \\ "result").text
+    val date = (xmlResult \\ "mavenModuleSetBuild" \\ "changeSet" \\ "item" \\ "date").text
+
     val buf = new StringBuilder
-    buf.append("Failure Test = " + failureTest )
-    buf.append("Skip Test = " + skipTest  )
-    buf.append("Count Test = "+ totalTest)
-    buf.append("User Name  = "+ user)
-    buf.append("Resul  = "+ result)
-    buf.append("Date  = "+ date)
-    
+    buf.append("Failure Test = " + failureTest)
+    buf.append("Skip Test = " + skipTest)
+    buf.append("Count Test = " + totalTest)
+    buf.append("User Name  = " + user)
+    buf.append("Resul  = " + result)
+    buf.append("Date  = " + date)
 
     Ok(views.html.index.render(buf.toString))
   }
 
-  def parseJson(): String = {
+  def dashboard = Action {
 
-    val json: JsValue = Json.parse("""
-{
-  "user": {
-    "name" : "toto",
-    "age" : 25,
-    "email" : "toto@jmail.com",
-    "isAlive" : true,
-    "friend" : {
-      "name" : "tata",
-      "age" : 20,
-      "email" : "tata@coldmail.com"
-    }
+    val resp = JenkinsService.callService("Cortellis-Services-Alert-SEDA-build")
+
+    val xml = scala.xml.XML.load(resp.get)
+
+    Ok(views.html.index.render(xml.toString()))
   }
-}
-""")
 
-    val name: String = (json \ "user" \ "name").as[String]
-
-    name
-  }
 }
