@@ -68,20 +68,24 @@ object Application extends Controller {
     //
     var html :StringBuilder  = new StringBuilder
 
+    html.append("<ul>")
+    
     results.foreach{
       keyVal => {
-        html.append("<h1>").append(keyVal._1).append("</h1>")
+        html.append("<li>").append(keyVal._1)
 
         val currentBuildNumber = (keyVal._2 \\  "lastBuild" \\ "number").text
         val lastFailBuildNumber = (keyVal._2 \\ "lastFailedBuild" \\ "number").text
 
         html.append(currentBuildNumber match {
-          case currentBuildNumber if currentBuildNumber.equals(lastFailBuildNumber) => "<img src='/assets/images/error.png' />"
-          case _ => "<img src='/assets/images/success.png' />"
-        })
+          case currentBuildNumber if currentBuildNumber.equals(lastFailBuildNumber) => " - <img src='/assets/images/error.png' />"
+          case _ => " - <img src='/assets/images/success.png' />"
+        }).append("</li>")
        }
       }
 
+     html.append("</ul>")
+    
     Ok(views.html.dashboard.render(html))
   }
 

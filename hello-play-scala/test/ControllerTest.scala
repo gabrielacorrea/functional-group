@@ -10,9 +10,9 @@ import play.api.test.Helpers._
 @RunWith(classOf[JUnitRunner])
 class ApplicationTest extends Specification {
     
-    val app = Application.parseJson()
+  //  val app = Application.parseJson()
     
-    app must endWith("toto2")
+  //  app must endWith("toto2")
     
 }
 
