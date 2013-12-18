@@ -1,4 +1,4 @@
-@(message: String, detail: model.JobDetail)
+@(detail: model.JobDetail)
 
 @main("Welcome to Play Framework") {
 
@@ -6,7 +6,6 @@
     
     <div class="tab-content">
             <div class="div-edge">
-            	<div class="row">
 					<div class="col-sm-12">    
 					    <div class="form-group col-xs-4 ">
 				    		<label for="stateId" class="control-label">Last Build: @detail.lastBuild</label><br>
@@ -17,8 +16,15 @@
 				    		<label for="stateId" class="control-label">Skip Tests: @detail.skipTest</label><br>
             			</div>
             		</div>
-            	</div>
            	</div>
 		</div>
+		<br/>
+		
+		
+	<div class = "tab-content">
+	
+			<label class="control-label">History For Last 10 Jobs: @detail.status</label><br>
+	
+	</div>	
 
 }
