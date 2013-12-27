@@ -2,29 +2,21 @@
 
 @main("Welcome to Play Framework") {
 
-      
+    <br/><br/><br/> 
     
-    <div class="tab-content">
-            <div class="div-edge">
-					<div class="col-sm-12">    
-					    <div class="form-group col-xs-4 ">
-				    		<label for="stateId" class="control-label">Last Build: @detail.lastBuild</label><br>
-				    		<label for="stateId" class="control-label">User: @detail.user</label><br>
-				    		<label for="stateId" class="control-label">Result: @detail.result</label><br>
-				    		<label for="stateId" class="control-label">Total Tests: @detail.totalTest</label><br>
-				    		<label for="stateId" class="control-label">Failure Tests: @detail.failureTest</label><br>
-				    		<label for="stateId" class="control-label">Skip Tests: @detail.skipTest</label><br>
-            			</div>
-            		</div>
-           	</div>
-		</div>
-		<br/>
+    <div class="tab-content" style="float: left;  width:48%">
+    		<h1>DETAIL LAST JOB</h1>
+    		<label for="stateId" class="control-label">Last Build: @detail.lastBuild</label><br>
+    		<label for="stateId" class="control-label">User: @detail.user</label><br>
+    		<label for="stateId" class="control-label">Result: @detail.result</label><br>
+    		<label for="stateId" class="control-label">Total Tests: @detail.totalTest</label><br>
+    		<label for="stateId" class="control-label">Failure Tests: @detail.failureTest</label><br>
+    		<label for="stateId" class="control-label">Skip Tests: @detail.skipTest</label><br>
+	</div>
 		
-		
-	<div class = "tab-content">
-	
-			<label class="control-label">History For Last 10 Jobs: @detail.status</label><br>
-	
+	<div class = "tab-content"  style="float: left;  width:48%">
+			<h1>SUMMARY ALL JOBS</h1>
+			<label class="control-label">@Html(detail.status)</label><br>
 	</div>	
 
 }
