@@ -55,8 +55,6 @@ object Application extends Controller {
     val usersFailure = new ListBuffer[String]
 	
     val jobRange = firstBuild.toInt until lastJobNumber.toInt + 1
-
-    
     
     jobRange.foreach(
       x => {
@@ -77,11 +75,11 @@ object Application extends Controller {
     })
 
      usersSucess.filterNot(_.isEmpty()).groupBy(l => l).map(t => (t._1, t._2.length)).toSeq.sortBy(_._2).reverse.foreach((e: (String, Int)) => { 
-    	success.append(e._1).append("=").append(e._2).append("</br>")
+    	success.append(e._1).append(" = ").append(e._2).append("</br>")
      })  
       
      usersFailure.filterNot(_.isEmpty()).groupBy(l => l).map(t => (t._1, t._2.length)).toSeq.sortBy(_._2).reverse.foreach((e: (String, Int)) => { 
-    	 failure.append(e._1).append("=").append(e._2).append("</br>")
+    	 failure.append(e._1).append(" = ").append(e._2).append("</br>")
      }) 
      
      "<b>- TOTAL: " + (sumSuccess + sumFailure) + "</b>" + 
@@ -116,13 +114,13 @@ object Application extends Controller {
     result.toInt;
   }
   
-  def verifyJobStatus(jobName: String, jobNumber: Integer): String = {
-    (scala.xml.XML.load(JenkinsService.callService(jobName + "/" + jobNumber).get) \\ "result").text
-  }
-
   def dashboard = Action {
 
-    val jobs: Seq[String] = Seq("Cortellis-Services-Alert-SEDA-build", "Cortellis-Services-Export-build", "Cortellis-Services-Retrieve-Regulatory-CI")
+    val jobs: Seq[String] = Seq("Cortellis-Services-Alert-SEDA-build", 
+    							"Cortellis-Services-Export-build", 
+    							"Cortellis-Services-Search-build",
+    							"Cortellis-Services-Ogre-build",
+    							"Cortellis-Services-Retrieve-build")
 
     var results = Map[String, scala.xml.Elem]()
     jobs.map(job => results += job -> scala.xml.XML.load(JenkinsService.callService(job).get))
