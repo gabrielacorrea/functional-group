@@ -36,7 +36,7 @@ object Application extends Controller {
     val date = (xmlResult \\ "changeSet" \\ "item" \\ "date").text
     val summary = jobSummary(firstBuild, lastBuild, name)
     
-    val value = JobDetail(lastBuild, failureTest, skipTest, totalTest, user, result, date, summary)
+    val value = JobDetail(lastBuild, failureTest, skipTest, totalTest, user, result, date, summary, name)
 
     Ok(views.html.showDetail.render(value))
 
