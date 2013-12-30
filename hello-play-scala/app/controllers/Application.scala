@@ -19,7 +19,6 @@ object Application extends Controller {
   def showDetail(name: String) = Action {
     val url = name
     var resp = JenkinsService.callService(url)
-
     var xmlResult = scala.xml.XML.load(resp.get)
 
     val lastBuild = (xmlResult \\ "mavenModuleSet" \\ "lastBuild" \\ "number").text
@@ -35,18 +34,16 @@ object Application extends Controller {
     val result = (xmlResult \\ "result").text
     val date = (xmlResult \\ "changeSet" \\ "item" \\ "date").text
     val summary = jobSummary(firstBuild, lastBuild, name)
-    
     val value = JobDetail(lastBuild, failureTest, skipTest, totalTest, user, result, date, summary, name)
 
     Ok(views.html.showDetail.render(value))
-
   }
 
   def jobSummary(firstBuild: String, lastJobNumber: String, name: String): String = {
     var sumLastWeekSucess = 0
     var sumLastWeekFailure = 0
-    var sumLastMounthSucess = 0
-    var sumLastMounthFailure = 0
+    var sumLastMonthSucess = 0
+    var sumLastMonthFailure = 0
     var sumSuccess = 0
 	var sumFailure = 0
 	var success: StringBuilder = new StringBuilder
@@ -61,15 +58,15 @@ object Application extends Controller {
         val xmlResult  = scala.xml.XML.load(JenkinsService.callService(name + "/" + x).get)
         
         (xmlResult \\ "result").text match {
-          case "SUCCESS" => { 	sumSuccess = sumSuccess + 1; 
+          case "SUCCESS" => { 	sumSuccess += 1; 
         	  					usersSucess += (xmlResult \\ "action" \\ "cause" \\ "userName").text ; 
         	  					sumLastWeekSucess += calculateDiffDays((xmlResult \\ "id").text, 7); 
-        	  					sumLastMounthSucess+= calculateDiffDays((xmlResult \\ "id").text, 30); 
+        	  					sumLastMonthSucess+= calculateDiffDays((xmlResult \\ "id").text, 30); 
           } 
-          case _ => { sumFailure = sumFailure + 1; 
+          case _ => { sumFailure += 1;
           			  usersFailure += (xmlResult \\ "action" \\ "cause" \\ "userName").text; 
           			  sumLastWeekFailure += calculateDiffDays((xmlResult \\ "id").text, 7) ; 
-          			  sumLastMounthFailure+= calculateDiffDays((xmlResult \\ "id").text, 30); 
+          			  sumLastMonthFailure+= calculateDiffDays((xmlResult \\ "id").text, 30); 
           }
         }
     })
@@ -88,9 +85,9 @@ object Application extends Controller {
      "</br></br><b>- TOTAL Last Week: " + (sumLastWeekSucess + sumLastWeekFailure) + "</b>" +
      "</br>- Last week with SUCESS: " + sumLastWeekSucess + 
      "</br>- Last week with FAILURE: " + sumLastWeekFailure + 
-     "</br></br><b>- TOTAL Last Mounth: " + (sumLastMounthSucess + sumLastMounthFailure) + "</b>" + 
-     "</br>- Last mounth with SUCESS: " + sumLastMounthSucess +
-     "</br>- Last mounth with FAILURE: " + sumLastMounthFailure + 
+     "</br></br><b>- TOTAL Last Month: " + (sumLastMonthSucess + sumLastMonthFailure) + "</b>" + 
+     "</br>- Last month with SUCESS: " + sumLastMonthSucess +
+     "</br>- Last month with FAILURE: " + sumLastMonthFailure + 
      "</br></br><b>- User/SUCESS: " + "</b>" +  
      "</br>" + success.toString +
      "</br></br><b>- User/FAILURE: " + "</b>" +  
