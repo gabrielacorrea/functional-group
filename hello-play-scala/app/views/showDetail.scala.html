@@ -1,22 +1,51 @@
-@(detail: model.JobDetail)
+@(detail:model.JobDetail,summary: model.SummaryDetails)
 
 @main("Welcome to Play Framework") {
-
     <br/><br/><br/> 
     
-    <div class="tab-content" style="float: left;  width:48%">
-    		<h1>DETAIL LAST JOB</h1>
-    		<label for="stateId" class="control-label">Last Build: @detail.lastBuild</label><br>
-    		<label for="stateId" class="control-label">User: @detail.user</label><br>
-    		<label for="stateId" class="control-label">Result: @detail.result</label><br>
-    		<label for="stateId" class="control-label">Total Tests: @detail.totalTest</label><br>
-    		<label for="stateId" class="control-label">Failure Tests: @detail.failureTest</label><br>
-    		<label for="stateId" class="control-label">Skip Tests: @detail.skipTest</label><br>
-	</div>
+    <html>
+    <head>
+	 
+    </head>
 		
-	<div class = "tab-content"  style="float: left;  width:48%">
+	<body>
+        <br/>
+    
+    <div class="tab-content" style="float: left; width:48%">
+                    <h1>DETAIL LAST JOB</h1>
+                    <label for="stateId" class="control-label">Last Build: @detail.lastBuild</label><br>
+                    <label for="stateId" class="control-label">User: @detail.user</label><br>
+                    <label for="stateId" class="control-label">Result: @detail.result</label><br>
+                    <label for="stateId" class="control-label">Total Tests: @detail.totalTest</label><br>
+                    <label for="stateId" class="control-label">Failure Tests: @detail.failureTest</label><br>
+                    <label for="stateId" class="control-label">Skip Tests: @detail.skipTest</label><br>
+        </div>
+		
+		<div class = "tab-content"  style="float: left;  width:48%">
 			<h1>SUMMARY ALL JOBS</h1>
-			<label class="control-label">@Html(detail.status)</label><br>
-	</div>	
-
+			<label class="control-label"></label><br>
+			
+			<h2>Total Builds Results</h2>
+				<div id = "total"></div>						
+			<h2>Results Last Week</h2>
+				<div id = "lastWeek"></div>
+			<h2>Results Last Mounth</h2>
+				<div id = "lastMounth"></div>
+				
+			<h4>User/SUCESS</h4>
+			<div>@summary.userSucess</div>
+			<h4>User/FAILURE</h4>
+			<div>@summary.userFailure</div>
+			 
+	</div>
+	<script type="text/javascript" src="/assets/images/charts.js"></script>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script type="text/javascript">google.load("visualization", "1", {packages:["corechart"]});</script>
+	<script type="text/javascript">
+		drawChart('lastWeek',@summary.lastWeekSucess,@summary.lastWeekFails)
+		drawChart('lastMounth',@summary.lastMonthSucess,@summary.lastMonthFails)
+		drawChart('total',@summary.buildsSucess,@summary.buildsFails)
+	</script>
+	</body>	
+</html>
 }

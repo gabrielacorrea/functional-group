@@ -9,6 +9,8 @@ import service.JenkinsService
 import scala.collection.mutable.ListBuffer
 import java.util.Calendar
 import java.text.SimpleDateFormat
+import model.SummaryDetails
+import model.SummaryDetails
 
 object Application extends Controller {
 
@@ -34,15 +36,15 @@ object Application extends Controller {
     val user = (xmlResult \\ "action" \\ "cause" \\ "userName").text
     val result = (xmlResult \\ "result").text
     val date = (xmlResult \\ "changeSet" \\ "item" \\ "date").text
-    val summary = jobSummary(firstBuild, lastBuild, name)
     
-    val value = JobDetail(lastBuild, failureTest, skipTest, totalTest, user, result, date, summary)
+    val jobDetail = JobDetail(lastBuild, failureTest, skipTest, totalTest, user, result, date)
+    val summaryDetail = jobSummary(firstBuild, lastBuild, name)
 
-    Ok(views.html.showDetail.render(value))
+    Ok(views.html.showDetail.render(jobDetail,summaryDetail))
 
   }
 
-  def jobSummary(firstBuild: String, lastJobNumber: String, name: String): String = {
+  def jobSummary(firstBuild: String, lastJobNumber: String, name: String): SummaryDetails = {
     var sumLastWeekSucess = 0
     var sumLastWeekFailure = 0
     var sumLastMounthSucess = 0
@@ -82,19 +84,14 @@ object Application extends Controller {
     	 failure.append(e._1).append(" = ").append(e._2).append("</br>")
      }) 
      
-     "<b>- TOTAL: " + (sumSuccess + sumFailure) + "</b>" + 
-     "</br>- SUCCESS: " + sumSuccess + 
-     "</br>- FAILURE: " + sumFailure + 
-     "</br></br><b>- TOTAL Last Week: " + (sumLastWeekSucess + sumLastWeekFailure) + "</b>" +
-     "</br>- Last week with SUCESS: " + sumLastWeekSucess + 
-     "</br>- Last week with FAILURE: " + sumLastWeekFailure + 
-     "</br></br><b>- TOTAL Last Mounth: " + (sumLastMounthSucess + sumLastMounthFailure) + "</b>" + 
-     "</br>- Last mounth with SUCESS: " + sumLastMounthSucess +
-     "</br>- Last mounth with FAILURE: " + sumLastMounthFailure + 
-     "</br></br><b>- User/SUCESS: " + "</b>" +  
-     "</br>" + success.toString +
-     "</br></br><b>- User/FAILURE: " + "</b>" +  
-     "</br>" + failure.toString
+     val sumTotal = sumSuccess+sumFailure;
+     val totalLastWeek = sumLastWeekSucess + sumLastWeekFailure;
+     val totalLastMounth = sumLastMounthSucess + sumLastMounthFailure;
+     val topUserSucess = success.toString;
+     val topUserFailure = failure.toString;
+     
+     SummaryDetails(sumTotal,sumSuccess,sumFailure,totalLastWeek,sumLastMounthSucess,sumLastWeekFailure,totalLastMounth,
+         sumLastMounthSucess,sumLastMounthFailure,topUserSucess,topUserFailure)
      
   }
 
