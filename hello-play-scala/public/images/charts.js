@@ -1,5 +1,4 @@
 function drawChart(div,sucessos,falhas) {
-	alert("Teste");
       // Create the data table.
       var data = new google.visualization.DataTable();
       data.addColumn('string', 'Topping');
