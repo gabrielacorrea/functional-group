@@ -11,9 +11,7 @@ import play.api.test.Helpers._
 class ApplicationTest extends Specification {
     
   //  val app = Application.parseJson()
-    
   //  app must endWith("toto2")
-    
 }
 
 
