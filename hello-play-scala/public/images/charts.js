@@ -10,7 +10,9 @@ function drawChart(div,sucessos,falhas) {
 
       // Set chart options
       var options = {'width':400,
-                     'height':300};
+                     'height':300,
+                     is3D: true
+                     };
 
       // Instantiate and draw our chart, passing in some options.
       var chart = new google.visualization.PieChart(document.getElementById(div));
