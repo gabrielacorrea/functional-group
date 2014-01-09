@@ -1,6 +1,7 @@
 package service
 
 import java.io.InputStream
+import play.Logger
 
 object JenkinsService {
   val host = "https://ci.thomsonreuterslifesciences.com/jenkins/job/"
@@ -12,7 +13,7 @@ object JenkinsService {
       Some(conn.getInputStream())
     } catch {
       case e: Exception =>
-        error("post:" + scala.io.Source.fromInputStream(conn.getErrorStream).mkString)
+        Logger.error("post:" + scala.io.Source.fromInputStream(conn.getErrorStream).mkString)
         None
     }
   }
