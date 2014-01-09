@@ -1,16 +1,20 @@
 package controllers
 
+import java.text.SimpleDateFormat
+import java.util.Calendar
+
+import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.Map
 import scala.language.postfixOps
+
 import model.JobDetail
+import model.SummaryDetails
+import play.api.Play.current
+import play.api.cache.Cached
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import service.JenkinsService
-import scala.collection.mutable.ListBuffer
-import java.util.Calendar
-import java.text.SimpleDateFormat
-import model.SummaryDetails
-import model.SummaryDetails
+
 
 object Application extends Controller {
 
@@ -18,29 +22,31 @@ object Application extends Controller {
     Ok("Hello Scala")
   }
 
-  def showDetail(name: String) = Action {
-    val url = name
-    var resp = JenkinsService.callService(url)
-
-    var xmlResult = scala.xml.XML.load(resp.get)
-
-    val lastBuild = (xmlResult \\ "mavenModuleSet" \\ "lastBuild" \\ "number").text
-    val firstBuild = (xmlResult \\ "mavenModuleSet" \\ "firstBuild" \\ "number").text
-
-    resp = JenkinsService.callService(url + "/" + lastBuild)
-    xmlResult = scala.xml.XML.load(resp.get)
-
-    val failureTest = (xmlResult \\ "action" \\ "failCount").text
-    val skipTest = (xmlResult \\ "action" \\ "skipCount").text
-    val totalTest = (xmlResult \\ "action" \\ "totalCount").text
-    val user = (xmlResult \\ "action" \\ "cause" \\ "userName").text
-    val result = (xmlResult \\ "result").text
-    val date = (xmlResult \\ "changeSet" \\ "item" \\ "date").text
-
-    val jobDetail = JobDetail(lastBuild, failureTest, skipTest, totalTest, user, result, date)
-    val summaryDetail = jobSummary(firstBuild, lastBuild, name)
-
-    Ok(views.html.showDetail.render(jobDetail, summaryDetail))
+  def showDetail(name: String) = Cached("detail_" + name, 600) {
+    Action {
+	    val url = name
+	    var resp = JenkinsService.callService(url)
+	
+	    var xmlResult = scala.xml.XML.load(resp.get)
+	
+	    val lastBuild = (xmlResult \\ "mavenModuleSet" \\ "lastBuild" \\ "number").text
+	    val firstBuild = (xmlResult \\ "mavenModuleSet" \\ "firstBuild" \\ "number").text
+	
+	    resp = JenkinsService.callService(url + "/" + lastBuild)
+	    xmlResult = scala.xml.XML.load(resp.get)
+	
+	    val failureTest = (xmlResult \\ "action" \\ "failCount").text
+	    val skipTest = (xmlResult \\ "action" \\ "skipCount").text
+	    val totalTest = (xmlResult \\ "action" \\ "totalCount").text
+	    val user = (xmlResult \\ "action" \\ "cause" \\ "userName").text
+	    val result = (xmlResult \\ "result").text
+	    val date = (xmlResult \\ "changeSet" \\ "item" \\ "date").text
+	
+	    val jobDetail = JobDetail(lastBuild, failureTest, skipTest, totalTest, user, result, date)
+	    val summaryDetail = jobSummary(firstBuild, lastBuild, name)
+	
+	    Ok(views.html.showDetail.render(jobDetail, summaryDetail))
+    }
   }
 
   def jobSummary(firstBuild: String, lastJobNumber: String, name: String): SummaryDetails = {
@@ -110,38 +116,39 @@ object Application extends Controller {
     result.toInt;
   }
 
-  def dashboard = Action {
-
-    val jobs: Seq[String] = Seq("Cortellis-Services-MR-build",
-      "Cortellis-Services-Export-build",
-      "Cortellis-Services-Retrieve-build",
-      "Cortellis-Services-ALL-build",
-      "Cortellis-Services-Science-Retrieve-build")
-
-    var results = Map[String, scala.xml.Elem]()
-    jobs.map(job => results += job -> scala.xml.XML.load(JenkinsService.callService(job).get))
-
-    var html: StringBuilder = new StringBuilder
-
-    html.append("<ul>")
-
-    results.foreach {
-      keyVal =>
-        {
-          html.append("<li><h3> <a href ='showDetail/" + keyVal._1 + "'>").append(keyVal._1)
-
-          val currentBuildNumber = (keyVal._2 \\ "lastBuild" \\ "number").text
-          val lastFailBuildNumber = (keyVal._2 \\ "lastFailedBuild" \\ "number").text
-
-          html.append(currentBuildNumber match {
-            case currentBuildNumber if currentBuildNumber.equals(lastFailBuildNumber) => " - <img src='/assets/images/error.png' />"
-            case _ => " - <img src='/assets/images/success.png' width='38' height='38' />"
-          }).append("</a></h3></li>")
-        }
-    }
-
-    html.append("</ul>")
-
-    Ok(views.html.dashboard.render(html))
-  }
+  def dashboard = Cached("dashboard", 600) { 
+	  Action {
+	    val jobs: Seq[String] = Seq("Cortellis-Services-MR-build",
+	      "Cortellis-Services-Export-build",
+	      "Cortellis-Services-Retrieve-build",
+	      "Cortellis-Services-ALL-build",
+	      "Cortellis-Services-Science-Retrieve-build")
+	
+	    var results = Map[String, scala.xml.Elem]()
+	    jobs.map(job => results += job -> scala.xml.XML.load(JenkinsService.callService(job).get))
+	
+	    var html: StringBuilder = new StringBuilder
+	
+	    html.append("<ul>")
+	
+	    results.foreach {
+	      keyVal =>
+	        {
+	          html.append("<li><h3> <a href ='showDetail/" + keyVal._1 + "'>").append(keyVal._1)
+	
+	          val currentBuildNumber = (keyVal._2 \\ "lastBuild" \\ "number").text
+	          val lastFailBuildNumber = (keyVal._2 \\ "lastFailedBuild" \\ "number").text
+	
+	          html.append(currentBuildNumber match {
+	            case currentBuildNumber if currentBuildNumber.equals(lastFailBuildNumber) => " - <img src='/assets/images/error.png' />"
+	            case _ => " - <img src='/assets/images/success.png' width='38' height='38' />"
+	          }).append("</a></h3></li>")
+	        }
+	    }
+	
+	    html.append("</ul>")
+	
+	    Ok(views.html.dashboard.render(html))
+	  }
+  	}
 }

@@ -1,6 +1,7 @@
 package service
 
 import java.io.InputStream
+
 import play.Logger
 
 object JenkinsService {
@@ -19,7 +20,7 @@ object JenkinsService {
   }
 
   private def connection(host: String): java.net.HttpURLConnection = {
-    println(host)
+    Logger.info(host)
     val url = new java.net.URL(host)
     val conn = url.openConnection.asInstanceOf[java.net.HttpURLConnection]
     conn.setRequestMethod("GET")
