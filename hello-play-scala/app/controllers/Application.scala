@@ -22,7 +22,7 @@ object Application extends Controller {
     Ok("Hello Scala")
   }
 
-  def showDetail(name: String) = Cached("detail_" + name, 600) {
+  def showDetail(name: String) = Cached("detail_" + name, 10000) {
     Action {
 	    val url = name
 	    var resp = JenkinsService.callService(url)
@@ -116,7 +116,7 @@ object Application extends Controller {
     result.toInt;
   }
 
-  def dashboard = Cached("dashboard", 600) { 
+  def dashboard = Cached("dashboard", 10000) { 
 	  Action {
 	    val jobs: Seq[String] = Seq("Cortellis-Services-MR-build",
 	      "Cortellis-Services-Export-build",
